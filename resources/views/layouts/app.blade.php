@@ -72,12 +72,15 @@
                     </div>
                 </div>
             @endif
-        </div><br>
+        </div>
+        <div id = "cartboxcontainer" class = 'basic container'>
+        <br>
                 <a class="ui large label">
   <i class="large brown cart icon"></i>
   
-  AED 11,000
+  AED 0.00
 </a>
+</div>
     </div>
 
 
@@ -90,21 +93,49 @@
         <div class="item">
             
         </div>
-        <a class='active item' href="{{ url('/home') }}"><i class="home icon"></i> Home</a>
-        <a class='item' href="{{ url('/items') }}"><i class="cubes icon"></i> Items</a>
+        <a class='{{(Request::is('home')) ? "active" : "" }} item' href="{{ url('/home') }}"><i class="home icon"></i> Home</a>
+        <a class='{{(Request::is('items')) ? "active" : "" }} item' href="{{ url('/items') }}"><i class="cubes icon"></i> Price List</a>
+        <a class='{{(Request::is('orders')) ? "active" : "" }} item' href="{{ url('/items') }}"><i class="shipping icon"></i> Orders</a>
+        <a class='{{(Request::is('faq')) ? "active" : "" }} item' href="{{ url('/items') }}"><i class="info icon"></i> FAQ</a>
+
+
+
+
+        <div class = 'right aligned menu'>
+        <a class='{{(Request::is('myorders')) ? "active" : "" }} item' href="{{ url('/items') }}"><i class="user icon"></i> My Account</a>
+        </div>
     </div>
 </div>
-
+        <script>
+        var contentloader = function (link, target, callback) {
+            var dimmer = $(target).html();
+            $(target).html(dimmer);            
+            $.get('<?php echo URL::to('/');?>' + "/" + link , function(data){      
+                $(target).html(data);
+                $('.pagedata.active.dimmer').removeClass('active');
+                callback(data);
+            });
+        }
+    </script>
     @yield('content')
 
     <!-- JavaScripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="{{asset('sui/semantic.min.js')}}"></script>
+    <script src="{{asset('sui/notify.min.js')}}"></script>
     
     {{-- <script src="{{ elixir('js/app.js') }}"></script> --}}
 
     <script>
      $('.dropdown').dropdown();
+           var refreshcart = function() {
+        contentloader('cart/getbox','#cartboxcontainer',function(data){
+               $('#cartboxcontainer').transition('flash');
+              
+            }); 
+      };
+      refreshcart();
     </script>
+
 </body>
 </html>

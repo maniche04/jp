@@ -40,4 +40,21 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/items', 'ItemsController@index'); 
 
     Route::get('/items/search', 'ItemsController@search'); 
+
+    Route::post('/cart/add','CartController@add');
+
+    Route::post('/cart/remove','CartController@remove');
+
+    Route::get('/cart/getbox','CartController@getbox');
+
+    Route::get('/settings/setlayout/{value}','SettingsController@setLayout');
+
+    Route::group(['middleware' => 'verifyadmin'], function() {
+	    
+	    Route::get('/admin', 'AdminController@updatePrices');
+
+	});
+
+
+
 });

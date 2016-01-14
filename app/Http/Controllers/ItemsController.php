@@ -28,7 +28,8 @@ class ItemsController extends Controller
     {
 
         $items = \DB::table('itemmas')->get();
-        return view('items.itemlanding', array('itemlist'=>$items));
+        $defaultview = \Auth::user()->defaultview;
+        return view('items.itemlanding', array('itemlist'=>$items, 'view'=>$defaultview));
     }
 
         /**
@@ -40,18 +41,25 @@ class ItemsController extends Controller
     {
         $hotkey = Input::get('hotkey');
         $userid = \Auth::user()->id;
-        $sqlquery = "SELECT A.*, B.aedprice, B.usdprice, B.ispromo, B.promodisc, C.currstock, C.laststock, IFNULL(D.selqty,0) as selqty FROM itemmas A
-        LEFT JOIN itemprices B ON A.itemcode = B.itemcode LEFT JOIN itemstocks C ON A.itemcode = C.itemcode LEFT JOIN currentcart D ON A.itemcode = D.itemcode AND D.userid = 1 WHERE B.classid IN (SELECT classid FROM users WHERE id = 1) ";
+        $usercurrency = \Auth::user()->currency;
+        $resultstr = '';
+        $sqlquery = "SELECT A.*, B.aedprice, B.usdprice, B.ispromo, B.promodisc, C.currstock, C.laststock, IFNULL(D.selqty,0) as selqty, D.currency as cartcurr, D.totalprice as cartitemtot FROM itemmas A
+        LEFT JOIN itemprices B ON A.itemcode = B.itemcode LEFT JOIN itemstocks C ON A.itemcode = C.itemcode LEFT JOIN currentcart D ON A.itemcode = D.itemcode AND D.userid = " . $userid . " WHERE A.isactive = 1 AND B.isactive = 1 AND C.isactive = 1 AND B.classid IN (SELECT classid FROM users WHERE id = " . $userid . ") ";
 
 
         if (strlen($hotkey) > 0) {
             $items = \DB::select($sqlquery . " AND A.itemname LIKE '%" . $hotkey . "%'");      
-
+            $resultstr = count($items) . ' matching item(s)';
         } else {
-            $items = \DB::select($sqlquery . " LIMIT 100");      
+            $items = \DB::select($sqlquery . " LIMIT 100");
         }
 
-        
-        return view('items.itemgrid', array('itemlist'=>$items));
+        $defaultview = \Auth::user()->defaultview;
+
+        if ($defaultview == 'grid') {
+            return view('items.itemgrid', array('itemlist'=>$items, 'currency'=>$usercurrency,'result'=>$resultstr));
+        } else {
+            return view('items.itemlist', array('itemlist'=>$items, 'currency'=>$usercurrency,'result'=>$resultstr));
+        }
     }
 }
