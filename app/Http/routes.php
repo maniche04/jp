@@ -51,7 +51,14 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::group(['middleware' => 'verifyadmin'], function() {
 	    
-	    Route::get('/admin', 'AdminController@updatePrices');
+	    Route::get('/admin', 'AdminController@index');
+	    Route::get('/admin/prices', 'AdminController@updatePrices');
+	    Route::get('/admin/items', 'AdminController@updateItems');
+	    Route::post('/admin/items/upload', 'AdminController@uploadItems');
+	    Route::get('/admin/items/read/{filename}','AdminController@runItemUpdate');
+	    Route::get('/admin/getprogress/{type}', 'AdminController@getProgress');
+
+
 
 	});
 
